@@ -1,0 +1,75 @@
+id: Ex_1_Chatgpt
+namespace: chatgpt
+
+tasks:
+  - id: downloads
+    type: io.kestra.plugin.gcp.gcs.Download
+    serviceAccount: "{{kv('GCP_CREDS_CGPT')}}"
+    from: gs://bucker_ejercicio_1_kestra_cgpt/weather_data.csv
+   
+
+  - id: table_weather
+    type: io.kestra.plugin.jdbc.postgresql.Queries
+    sql: |
+      CREATE TABLE IF NOT EXISTS weather_data (
+        ghi             integer,
+        dhi             integer,
+        precip          double precision,
+        timestamp_utc   timestamp,
+        temp            double precision,
+        app_temp        double precision,
+        dni             integer,
+        snow_depth      integer,
+        wind_cdir       text,
+        rh              integer,
+        pod             text,
+        pop             integer,
+        ozone           integer,
+        clouds_hi       integer,
+        clouds          integer,
+        vis             double precision,
+        wind_spd        double precision,
+        wind_cdir_full  text,
+        slp             integer,
+        datetime        text,
+        ts              integer,
+        pres            integer,
+        dewpt           double precision,
+        uv              integer,
+        clouds_mid      integer,
+        wind_dir        integer,
+        snow            integer,
+        clouds_low      integer,
+        solar_rad       double precision,
+        wind_gust_spd   double precision,
+          timestamp_local timestamp,
+        description     text,
+        code            integer,
+        icon            text
+      );
+  
+
+  - id: copy_into_table
+    type: io.kestra.plugin.jdbc.postgresql.CopyIn
+    format: CSV
+    from: "{{ outputs.downloads.uri }}"
+    table: weather_data
+    header: true
+    columns: [ghi, dhi, precip, timestamp_utc, temp, app_temp, dni,
+       snow_depth, wind_cdir, rh, pod, pop, ozone, clouds_hi,
+       clouds, vis, wind_spd, wind_cdir_full, slp, datetime, ts,
+       pres, dewpt, uv, clouds_mid, wind_dir, snow, clouds_low,
+       solar_rad, wind_gust_spd, timestamp_local, description,
+       code, icon]
+
+    # añadimos para borrar los csv de nuestro sistema        
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: To avoid cluttering your storage, we will remove the downloaded files 
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://host.docker.internal:5433/kestra
+      username: kestra
+      password: kestra
