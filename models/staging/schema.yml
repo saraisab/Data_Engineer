@@ -1,4 +1,4 @@
-reversion: 2
+version: 2
 
 sources:
   - name: staging
@@ -8,8 +8,40 @@ sources:
     tables:
       - name: green_tripdata
       - name: yellow_tripdata
+      - name: fhv_tripdata
 
 models:
+  - name: stg_staging__fhv_tripdata
+    description: ""
+    columns:
+      - name: dispatching_base_num
+        data_type: string
+        description: ""
+
+      - name: pick_up_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropOff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: PUlocationID
+        data_type: int64
+        description: ""
+
+      - name: DOlocationID
+        data_type: int64
+        description: ""
+        
+      - name: SR_Flag
+        data_type: numeric
+        description: ""
+
+      - name: Affiliated_base_number
+        data_type: string
+        description: ""
+
   - name: stg_staging__green_tripdata
     description: ""
     columns:
